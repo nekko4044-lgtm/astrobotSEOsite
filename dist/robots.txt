@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://astrobot-se-osite.vercel.app/sitemap.xml
