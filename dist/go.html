@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Synastry AI — Discover Your True Compatibility</title>
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="description" content="Get your deep AI-powered astrological compatibility reading.">
+
+  <!-- Meta Pixel Code -->
+  <script>
+  !function(f,b,e,v,n,t,s)
+  {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+  n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+  if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+  n.queue=[];t=b.createElement(e);t.async=!0;
+  t.src=v;s=b.getElementsByTagName(e)[0];
+  s.parentNode.insertBefore(t,s)}(window, document,'script',
+  'https://connect.facebook.net/en_US/fbevents.js');
+  fbq('init', '1018030387232568');
+  fbq('track', 'PageView');
+  </script>
+  <noscript><img height="1" width="1" style="display:none"
+  src="https://www.facebook.com/tr?id=1018030387232568&ev=PageView&noscript=1"
+  /></noscript>
+  <!-- End Meta Pixel Code -->
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg:            #0A0612;
+      --bg2:           #14091F;
+      --violet:        #C49AFF;
+      --violet-glow:   rgba(196,154,255,0.45);
+      --violet-dim:    rgba(196,154,255,0.10);
+      --violet-border: rgba(196,154,255,0.20);
+      --text:          #F5F0FF;
+      --text2:         #C0B0D8;
+      --tg:            #2AABEE;
+      --tg-dark:       #1A8EC8;
+      --tg-glow:       rgba(42,171,238,0.40);
+      --font:          'JetBrains Mono', monospace;
+      --r:             20px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { height: 100%; }
+
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100dvh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 16px;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* ── Nebula atmosphere ──────────────────────────── */
+    .nebula {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      background:
+        radial-gradient(ellipse 70% 60% at 50% 45%, rgba(80,30,160,0.18) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 35% at 25% 65%, rgba(196,154,255,0.07) 0%, transparent 60%),
+        radial-gradient(ellipse 35% 30% at 75% 35%, rgba(42,171,238,0.05) 0%, transparent 60%);
+    }
+
+    /* ── Star field (populated by JS) ──────────────── */
+    #sky {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    .s {
+      position: absolute;
+      border-radius: 50%;
+      animation: twinkle var(--d) ease-in-out var(--dl) infinite;
+    }
+
+    @keyframes twinkle {
+      0%, 100% { opacity: var(--lo); transform: scale(1); }
+      50%       { opacity: var(--hi); transform: scale(1.4); }
+    }
+
+    /* ── Card ───────────────────────────────────────── */
+    .card {
+      position: relative;
+      z-index: 10;
+      width: min(460px, 100%);
+      padding: 44px 36px 36px;
+      background: rgba(18, 8, 28, 0.70);
+      backdrop-filter: blur(28px) saturate(1.4);
+      -webkit-backdrop-filter: blur(28px) saturate(1.4);
+      border: 1px solid var(--violet-border);
+      border-radius: 26px;
+      box-shadow:
+        0 0 0 1px rgba(196,154,255,0.04),
+        0 12px 48px rgba(0,0,0,0.55),
+        0 0 100px rgba(196,154,255,0.05),
+        inset 0 1px 0 rgba(196,154,255,0.14);
+      text-align: center;
+      animation:
+        cardIn 0.65s cubic-bezier(0.34, 1.52, 0.64, 1) both,
+        cardFloat 7s ease-in-out 0.65s infinite;
+    }
+
+    @keyframes cardIn {
+      from { opacity: 0; transform: translateY(28px) scale(0.96); }
+      to   { opacity: 1; transform: translateY(0)    scale(1);    }
+    }
+
+    @keyframes cardFloat {
+      0%, 100% { transform: translateY(0px);  }
+      50%       { transform: translateY(-7px); }
+    }
+
+    /* ── Badge ──────────────────────────────────────── */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 5px 14px 5px 10px;
+      background: var(--violet-dim);
+      border: 1px solid var(--violet-border);
+      border-radius: 100px;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.10em;
+      text-transform: uppercase;
+      color: var(--violet);
+      margin-bottom: 26px;
+    }
+
+    .badge-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--violet);
+      box-shadow: 0 0 8px var(--violet-glow);
+      flex-shrink: 0;
+      animation: dotPulse 2s ease-in-out infinite;
+    }
+
+    @keyframes dotPulse {
+      0%, 100% { transform: scale(1);   opacity: 1;   }
+      50%       { transform: scale(1.6); opacity: 0.5; }
+    }
+
+    /* ── Constellation ornament ─────────────────────── */
+    .ornament {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 20px;
+      opacity: 0.5;
+    }
+
+    /* ── Headline ───────────────────────────────────── */
+    h1 {
+      font-size: clamp(21px, 5.5vw, 29px);
+      font-weight: 700;
+      line-height: 1.28;
+      letter-spacing: -0.025em;
+      margin-bottom: 14px;
+    }
+
+    h1 .hl {
+      color: var(--violet);
+      position: relative;
+    }
+
+    h1 .hl::after {
+      content: '';
+      position: absolute;
+      left: 0; bottom: -1px; right: 0; height: 1px;
+      background: linear-gradient(90deg, transparent 0%, var(--violet) 40%, transparent 100%);
+      opacity: 0.6;
+    }
+
+    /* ── Subheadline ────────────────────────────────── */
+    .sub {
+      font-size: 13.5px;
+      line-height: 1.7;
+      color: var(--text2);
+      margin-bottom: 34px;
+      max-width: 310px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    /* ── CTA button ─────────────────────────────────── */
+    .cta {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 11px;
+      width: 100%;
+      padding: 17px 28px;
+      background: linear-gradient(140deg, #2AABEE 0%, #1590CC 100%);
+      color: #fff;
+      font-family: var(--font);
+      font-size: 15.5px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      border: none;
+      border-radius: 14px;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      margin-bottom: 22px;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+      animation: ctaPulse 2.8s ease-in-out 1.2s infinite;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    @keyframes ctaPulse {
+      0%, 100% { box-shadow: 0 4px 22px var(--tg-glow), 0 0 0 0 rgba(42,171,238,0); }
+      50%       { box-shadow: 0 6px 36px var(--tg-glow), 0 0 0 7px rgba(42,171,238,0.07); }
+    }
+
+    .cta::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(155deg, rgba(255,255,255,0.18) 0%, transparent 55%);
+      pointer-events: none;
+    }
+
+    .cta:hover  { transform: translateY(-2px); box-shadow: 0 10px 44px rgba(42,171,238,0.55); animation: none; }
+    .cta:active { transform: translateY(1px);  box-shadow: 0 3px 12px rgba(42,171,238,0.35); }
+
+    .cta.sending { pointer-events: none; animation: none; opacity: 0.85; }
+
+    /* Ripple */
+    .ripple {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.28);
+      transform: scale(0);
+      animation: rippleOut 0.55s linear forwards;
+      pointer-events: none;
+    }
+
+    @keyframes rippleOut {
+      to { transform: scale(4); opacity: 0; }
+    }
+
+    /* ── Social proof strip ─────────────────────────── */
+    .proof {
+      display: flex;
+      border: 1px solid var(--violet-border);
+      border-radius: 13px;
+      background: rgba(196,154,255,0.04);
+      overflow: hidden;
+    }
+
+    .proof-item {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      padding: 12px 6px;
+      position: relative;
+    }
+
+    .proof-item + .proof-item::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 18%; bottom: 18%;
+      width: 1px;
+      background: var(--violet-border);
+    }
+
+    .proof-icon {
+      height: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--violet);
+      margin-bottom: 2px;
+    }
+
+    .proof-val {
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .proof-lbl {
+      font-size: 9.5px;
+      color: var(--text2);
+      opacity: 0.65;
+      letter-spacing: 0.04em;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="nebula" aria-hidden="true"></div>
+  <div id="sky"       aria-hidden="true"></div>
+
+  <main class="card">
+
+    <div class="badge"><span class="badge-dot"></span>AI Astrology</div>
+
+    <!-- Constellation ornament -->
+    <div class="ornament" aria-hidden="true">
+      <svg width="140" height="36" viewBox="0 0 140 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Lines -->
+        <line x1="10" y1="18" x2="40" y2="8"  stroke="#C49AFF" stroke-width="0.7" stroke-dasharray="2 2" opacity="0.5"/>
+        <line x1="40" y1="8"  x2="70" y2="26" stroke="#C49AFF" stroke-width="0.7" stroke-dasharray="2 2" opacity="0.5"/>
+        <line x1="70" y1="26" x2="100" y2="10" stroke="#C49AFF" stroke-width="0.7" stroke-dasharray="2 2" opacity="0.5"/>
+        <line x1="100" y1="10" x2="130" y2="20" stroke="#C49AFF" stroke-width="0.7" stroke-dasharray="2 2" opacity="0.5"/>
+        <!-- Stars -->
+        <circle cx="10"  cy="18" r="2.5" fill="#C49AFF" opacity="0.9"/>
+        <circle cx="40"  cy="8"  r="2"   fill="#C49AFF" opacity="0.7"/>
+        <circle cx="70"  cy="26" r="3"   fill="#C49AFF" opacity="1.0"/>
+        <circle cx="100" cy="10" r="2"   fill="#C49AFF" opacity="0.7"/>
+        <circle cx="130" cy="20" r="2.5" fill="#C49AFF" opacity="0.85"/>
+        <!-- Glow on center star -->
+        <circle cx="70" cy="26" r="6" fill="#C49AFF" opacity="0.12"/>
+      </svg>
+    </div>
+
+    <h1>Discover your <span class="hl">true compatibility</span> with AI</h1>
+
+    <p class="sub">Tap the button below to get your deep psychological reading</p>
+
+    <button class="cta" id="cta" onclick="handleCTA(event)" aria-label="Open Synastry AI bot in Telegram">
+      <!-- Telegram logo -->
+      <svg width="21" height="21" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.248-2.01 9.472c-.148.658-.537.818-1.084.51l-3-2.21-1.447 1.394c-.16.16-.294.294-.603.294l.215-3.048 5.558-5.023c.242-.215-.052-.334-.373-.12L8.947 13.843l-2.962-.924c-.643-.2-.656-.642.136-.953l11.568-4.46c.536-.194 1.006.13.873.742z" fill="white"/>
+      </svg>
+      Open in Telegram
+    </button>
+
+    <!-- Social proof -->
+    <div class="proof" role="list">
+
+      <div class="proof-item" role="listitem">
+        <div class="proof-icon">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+            <path d="M8 1l1.8 3.6 4 .6-2.9 2.8.7 4L8 10l-3.6 1.9.7-4L2.2 5.2l4-.6L8 1z" fill="#C49AFF"/>
+          </svg>
+        </div>
+        <span class="proof-val">4.9 / 5</span>
+        <span class="proof-lbl">Rating</span>
+      </div>
+
+      <div class="proof-item" role="listitem">
+        <div class="proof-icon">
+          <svg width="17" height="14" viewBox="0 0 17 14" fill="none" aria-hidden="true">
+            <ellipse cx="6"  cy="4.5" rx="2.8" ry="2.8" fill="#C49AFF" opacity="0.9"/>
+            <ellipse cx="11" cy="4.5" rx="2.8" ry="2.8" fill="#C49AFF" opacity="0.6"/>
+            <path d="M0.5 13c0-3 2.5-5 5.5-5h1c3 0 5.5 2 5.5 5" stroke="#C49AFF" stroke-width="1.1" stroke-linecap="round" fill="none" opacity="0.9"/>
+            <path d="M9.5 9c1.5-0.8 3.5 0.2 4.5 1.5" stroke="#C49AFF" stroke-width="1.1" stroke-linecap="round" fill="none" opacity="0.6"/>
+          </svg>
+        </div>
+        <span class="proof-val">50,000+</span>
+        <span class="proof-lbl">Users</span>
+      </div>
+
+      <div class="proof-item" role="listitem">
+        <div class="proof-icon">
+          <svg width="14" height="16" viewBox="0 0 14 16" fill="none" aria-hidden="true">
+            <rect x="1" y="6" width="12" height="9" rx="2.5" stroke="#C49AFF" stroke-width="1.2" fill="none"/>
+            <path d="M4 6V4.5a3 3 0 016 0V6" stroke="#C49AFF" stroke-width="1.2" stroke-linecap="round" fill="none"/>
+            <circle cx="7" cy="10.5" r="1.5" fill="#C49AFF"/>
+          </svg>
+        </div>
+        <span class="proof-val">Private</span>
+        <span class="proof-lbl">Secure</span>
+      </div>
+
+    </div>
+
+  </main>
+
+  <script>
+    // ── Star field generation ────────────────────────────────
+    (function () {
+      const sky = document.getElementById('sky');
+      const frag = document.createDocumentFragment();
+      const W = window.innerWidth, H = window.innerHeight;
+
+      for (let i = 0; i < 170; i++) {
+        const el   = document.createElement('div');
+        const size = Math.random() < 0.75 ? 1 : Math.random() < 0.8 ? 2 : 3;
+        const isV  = Math.random() < 0.12; // 12% violet stars
+        const dur  = (2.5 + Math.random() * 5).toFixed(2);
+        const del  = (-Math.random() * 7).toFixed(2);
+        const lo   = (0.08 + Math.random() * 0.22).toFixed(2);
+        const hi   = (0.55 + Math.random() * 0.45).toFixed(2);
+
+        el.className = 's';
+        el.style.cssText = [
+          `width:${size}px`,
+          `height:${size}px`,
+          `left:${(Math.random() * 100).toFixed(2)}%`,
+          `top:${(Math.random() * 100).toFixed(2)}%`,
+          `background:${isV ? '#C49AFF' : '#ffffff'}`,
+          isV ? `box-shadow:0 0 ${size + 2}px rgba(196,154,255,0.6)` : '',
+          `--d:${dur}s`,
+          `--dl:${del}s`,
+          `--lo:${lo}`,
+          `--hi:${hi}`,
+        ].filter(Boolean).join(';');
+
+        frag.appendChild(el);
+      }
+      sky.appendChild(frag);
+    })();
+
+    // ── CTA handler ──────────────────────────────────────────
+    // ↓ Замените на вашу реальную ссылку бота
+    var BOT_URL = 'https://t.me/SynastryAI_bot';
+
+    function handleCTA(e) {
+      var btn = document.getElementById('cta');
+
+      // Ripple effect
+      var r    = document.createElement('span');
+      r.className = 'ripple';
+      var rect = btn.getBoundingClientRect();
+      var sz   = Math.max(rect.width, rect.height);
+      r.style.cssText = 'width:' + sz + 'px;height:' + sz + 'px;' +
+        'left:' + (e.clientX - rect.left - sz / 2) + 'px;' +
+        'top:'  + (e.clientY - rect.top  - sz / 2) + 'px';
+      btn.appendChild(r);
+      setTimeout(function () { r.remove(); }, 600);
+
+      // Disable double-click
+      btn.classList.add('sending');
+
+      // Fire Meta Pixel Lead event
+      if (typeof fbq === 'function') {
+        fbq('track', 'Lead');
+      }
+
+      // Redirect to bot after pixel fires
+      setTimeout(function () {
+        window.location.href = BOT_URL;
+      }, 400);
+    }
+  </script>
+
+</body>
+</html>
