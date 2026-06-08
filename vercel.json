@@ -1,0 +1,9 @@
+{
+  "redirects": [
+    {
+      "source": "/go",
+      "destination": "https://t.me/SynastryAI_bot",
+      "permanent": false
+    }
+  ]
+}
