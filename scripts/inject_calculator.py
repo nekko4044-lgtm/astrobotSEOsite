@@ -46,7 +46,7 @@ CALC_BLOCK = """
           window.calcGo=function(){
             var v1=document.getElementById('calcSign1').value;
             var v2=document.getElementById('calcSign2').value;
-            window.location.href='/'+lang+'/compatibility/'+v1+'-'+v2+'.html';
+            window.location.href='/'+lang+'/compatibility/'+v1+'-'+v2;
           };
         })();
         </script>
